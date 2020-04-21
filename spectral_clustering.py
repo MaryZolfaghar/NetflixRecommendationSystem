@@ -65,6 +65,10 @@ def main(args):
     A_temp = A.copy()
     data = A_temp[:nu,:ni] # small 10 X 20 submatrix
     print(data.shape)
+
+    A_temp = A_fill_zeros.copy()
+    data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
+    print(data_fill_zeros.shape)
     #===========================================================================
     zero_nums = (np.sum((data==0).astype(int)))
     nonzero_nums = (np.sum((data!=0).astype(int)))
