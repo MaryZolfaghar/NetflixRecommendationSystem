@@ -55,7 +55,7 @@ parser.add_argument('--test_prc', type=float, default=0.1,
 main function
 """
 def main(args):
-    df, A = read_preprocss_data(args)
+    df, A, A_fill_zeros = read_preprocss_data(args)
     print('done reading the data')
 
     #===========================================================================
