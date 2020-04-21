@@ -46,6 +46,7 @@ def read_preprocss_data(args):
     print('Reading is done, the shape of the data is:', A.shape)
     ## Reading metadata ========================================================
     if args.metadata:
+        print('reading metadata')
         t1=[]; t2=[]; t3=[]
         with open(args.DATAPATH + 'movie_titles.txt', 'r',encoding="latin-1") as reading:
             for line in reading.readlines():
@@ -97,10 +98,11 @@ def read_preprocss_data(args):
         print(titles.shape)
         train_metadata['title'] = titles
         train_metadata['year_produced'] = years
+        print('done with creating metadata')
         ## =====================================================================
         # Save movie titles
         fn_str = args.DATAPATH + 'train_metadata.csv'
         with open(fn_str, 'wb') as f:
             pickle.dump(train_metadata, f)
-
-        return df, A, A_fill_zeros
+        print('done with creating metadata')
+    return df, A, A_fill_zeros
