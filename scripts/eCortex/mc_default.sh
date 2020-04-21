@@ -10,7 +10,6 @@ echo Running on $HOSTNAME
 source /usr/local/anaconda3/etc/profile.d/conda.sh
 conda activate /home/mazlfghr/.conda/envs/MLprj
 
-echo "Process starts"
-
+echo "Process matrix_completion starts"
 
 python matrix_completion.py
