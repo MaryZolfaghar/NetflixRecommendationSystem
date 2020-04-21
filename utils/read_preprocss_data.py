@@ -15,13 +15,13 @@ def read_preprocss_data(args):
     train.columns = ['movie_id', 'customer_id', 'rating', 'date']
     test.columns  = ['movie_id', 'customer_id', 'rating', 'date']
 
-    df = train.pivot_table(index='customer-id', \
-                               columns='movie-id', values='rating', aggfunc=np.mean).fillna(0)
+    df = train.pivot_table(index='customer_id', \
+                               columns='movie_id', values='rating', aggfunc=np.mean).fillna(0)
     A_fill_zeros = df.to_numpy().copy()
 
     if args.fillnan=='mean_col':
-        df = train.pivot_table(index='customer-id', \
-                               columns='movie-id', values='rating', aggfunc=np.mean)
+        df = train.pivot_table(index='customer_id', \
+                               columns='movie_id', values='rating', aggfunc=np.mean)
         A = df.to_numpy().copy()
         # column mean
         col_mean = np.nanmean(A, axis = 0)
@@ -31,8 +31,8 @@ def read_preprocss_data(args):
         # replace inds with avg of column
         A[inds] = np.take(col_mean, inds[1])
     elif args.fillnan=='mean_row':
-        df = train.pivot_table(index='customer-id', \
-                               columns='movie-id', values='rating', aggfunc=np.mean)
+        df = train.pivot_table(index='customer_id', \
+                               columns='movie_id', values='rating', aggfunc=np.mean)
         A = df.to_numpy().copy()
         # row mean
         row_mean = np.nanmean(A, axis = 1)

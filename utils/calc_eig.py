@@ -29,4 +29,4 @@ def calc_eig(args, L, Ws):
             / LA.norm(v[:,I[:args.norm_laplacian_k]])*vol**(1/2)
     else:
         v_norm = []
-     return e, v, v_norm
+    return e, v, v_norm
