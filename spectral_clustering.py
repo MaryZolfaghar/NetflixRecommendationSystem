@@ -61,18 +61,23 @@ def main(args):
 
     #===========================================================================
     # use a subset of data just for testing everything first
-    nu=100 # number of users
-    ni=200 # number of items
-    A_temp = A.copy()
-    data = A_temp[:nu,:ni] # small 10 X 20 submatrix
-    print(data.shape)
+    # nu=100 # number of users
+    # ni=200 # number of items
+    # A_temp = A.copy()
+    # data = A_temp[:nu,:ni] # small 10 X 20 submatrix
+    # print(data.shape)
+    #
+    # A_temp = A_fill_zeros.copy()
+    # data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
+    # print(data_fill_zeros.shape)
 
-    A_temp = A_fill_zeros.copy()
-    data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
-    print(data_fill_zeros.shape)
+    data = A.copy()
+    data_fill_zeros = A_fill_zeros.copy()
+    print('data shape is:', data.shape)
+    print('data fill zero shape is:', data_fill_zeros.shape)
     #===========================================================================
-    zero_nums = (np.sum((data==0).astype(int)))
-    nonzero_nums = (np.sum((data!=0).astype(int)))
+    zero_nums = (np.sum((data_fill_zeros==0).astype(int)))
+    nonzero_nums = (np.sum((data_fill_zeros!=0).astype(int)))
     sparsity = zero_nums / (zero_nums+nonzero_nums)
     print('sparsity index of the data is', sparsity)
 
@@ -80,9 +85,8 @@ def main(args):
     # STEP 4 - Using the k smallest eigenvector as input,
     # train a k-means model and use it to classify the data
     #===========================================================================
-    n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    n_k = [2, 10, 15, 20, 30]
-
+    n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 400, 500]
+    # n_k = [2, 10, 15, 20, 30]
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
     MSEs_test = np.zeros((args.n_epochs, len(n_k)))
     RMSEs_test = np.zeros((args.n_epochs, len(n_k)))

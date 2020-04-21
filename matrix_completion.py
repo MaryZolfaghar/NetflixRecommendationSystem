@@ -45,7 +45,7 @@ parser.add_argument('--kmeans_k', type=int, default=5,
                     help='number of clusters in kmeans')
 
 # train
-parser.add_argument('--n_epochs', type=int, default=10,
+parser.add_argument('--n_epochs', type=int, default=100,
                     help='number of epochs')
 parser.add_argument('--test_prc', type=float, default=0.1,
                     help='percentage for test dataset')
@@ -58,26 +58,28 @@ def main(args):
     print('done reading the data')
 
     #===========================================================================
-    # use a subset of data just for testing everything first
-    nu=100 # number of users
-    ni=200 # number of items
-    A_temp = A.copy()
-    data = A_temp[:nu,:ni] # small 10 X 20 submatrix
-    print(data.shape)
-
-    A_temp = A_fill_zeros.copy()
-    data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
-    print(data_fill_zeros.shape)
+    # # use a subset of data just for testing everything first
+    # nu=100 # number of users
+    # ni=200 # number of items
+    # A_temp = A.copy()
+    # data = A_temp[:nu,:ni] # small 10 X 20 submatrix
+    # print(data.shape)
+    #
+    # A_temp = A_fill_zeros.copy()
+    # data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
+    # print(data_fill_zeros.shape)
+    print('data shape is:', data.shape)
+    print('data fill zero shape is:', data_fill_zeros.shape)
     #===========================================================================
-    zero_nums = (np.sum((data==0).astype(int)))
-    nonzero_nums = (np.sum((data!=0).astype(int)))
+    zero_nums = (np.sum((data_fill_zeros==0).astype(int)))
+    nonzero_nums = (np.sum((data_fill_zeros!=0).astype(int)))
     sparsity = zero_nums / (zero_nums+nonzero_nums)
     print('sparsity index of the data is', sparsity)
     #===========================================================================
     # STEP
     #===========================================================================
     n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    n_k = [2, 10, 15, 20, 30]
+    # n_k = [2, 10, 15, 20, 30]
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
     MSEs_test = np.zeros((args.n_epochs, len(n_k)))
     RMSEs_test = np.zeros((args.n_epochs, len(n_k)))
