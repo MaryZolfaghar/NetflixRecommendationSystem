@@ -78,8 +78,9 @@ def main(args):
     #===========================================================================
     n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
-    errs_train = np.zeros((args.n_epochs, len(n_k)))
-    errs_test = np.zeros((args.n_epochs, len(n_k)))
+    MSEs_train = np.zeros((args.n_epochs, len(n_k)))
+    MSEs_test = np.zeros((args.n_epochs, len(n_k)))
+    RMSEs_test = np.zeros((args.n_epochs, len(n_k)))
 
     inds=np.nonzero(data_fill_zeros)
     nn=inds[0].shape[0]
@@ -114,16 +115,16 @@ def main(args):
                 err = (train_data[tst_ind0, tst_ind1] - data[tst_ind0, tst_ind1])**2
                 MSE = np.mean(err)
                 RMSE = np.sqrt(MSE)
-                MSEs[epch, ikk] = MSE
-                RMSEs[epch, ikk] = RMSE
+                MSEs_test[epch, ikk] = MSE
+                RMSEs_test[epch, ikk] = RMSE
                 if epch%5==0:
                     # Save errors
                     fn_str = args.RESULTPATH + 'mc_MSE_epch%s' %(epch)
                     with open(fn_str, 'wb') as f:
-                        pickle.dump(MSEs, f)
+                        pickle.dump(MSEs_test, f)
                     fn_str = args.RESULTPATH + 'mc_RMSE_epch%s' %(epch)
                     with open(fn_str, 'wb') as f:
-                        pickle.dump(RMSEs, f)
+                        pickle.dump(RMSEs_test, f)
 """
 ==============================================================================
 Main
