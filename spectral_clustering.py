@@ -205,6 +205,7 @@ def main(args):
                 RMSEs_test[epch, ikk] = RMSE_ts
                 print('MSE test is:', MSE_ts)
                 print('RMSE test is:', RMSE_ts)
+                
                 if epch%25==0:
                     # Save errors
                     fn_str = args.RESULTPATH + 'sc_MSE_tr_%s_%s_%s_%s_epch%s.npy' \
