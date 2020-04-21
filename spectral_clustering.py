@@ -79,6 +79,7 @@ def main(args):
     # If the graph (W) has K connected components, then L has K eigenvectors
     #with an eigenvalue of 0.
     #===========================================================================
+    Ws = sim_MXM.copy()
     L, D = calc_laplacian(args, Ws)
     #===========================================================================
     # STEP 3 - Compute the eigenvectors of the matrix L
@@ -93,7 +94,7 @@ def main(args):
     km.fit(U)
     print(km.labels_.shape)
     # Save labels
-    fn_str = args.RESULTPATH + 'kmeans_obj_%s' %(args.sim_method)
+    fn_str = args.RESULTPATH + 'kmeans_obj_MXM_k%s_%s' %(args.kmeans_k, args.sim_method)
     with open(fn_str, 'wb') as f:
         pickle.dump(km, f)
     #===========================================================================
