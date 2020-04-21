@@ -2,8 +2,10 @@
 Generating similarity matrix
 """
 
-from sklearn.metrics.pairwise import sigmoid_kernel, cosine_similarity
 import numpy as np
+import pickle
+from sklearn.metrics.pairwise import sigmoid_kernel, cosine_similarity
+
 
 def gen_similarity(args, X):
 
