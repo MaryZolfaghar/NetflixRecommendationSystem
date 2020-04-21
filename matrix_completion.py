@@ -112,7 +112,7 @@ def main(args):
                 pred_ratings = np.dot(np.dot(U, sigma), Vt)
                 print('pred_ratings time elapsed: {} sec'.format(time.time()-time_start))
 
-                err = (pred_ratings - tst_trget)**2
+                err = (pred_ratings[tst_ind0, tst_ind1] - tst_trget)**2
                 MSE = np.mean(err)
                 RMSE = np.sqrt(MSE)
                 MSEs_test[epch, ikk] = MSE
