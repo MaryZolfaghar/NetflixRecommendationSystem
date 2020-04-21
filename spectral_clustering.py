@@ -127,8 +127,9 @@ def main(args):
 
         #===========================================================================
         # STEP 1 - Calculate similarity
-        sim_UXU=cosine_similarity(X=train_data, Y=None)
-        sim_MXM=cosine_similarity(X=train_data.T, Y=None)
+        sim_UXU, sim_MXM = gen_similarity(args, train_data)
+        # sim_UXU=cosine_similarity(X=train_data, Y=None)
+        # sim_MXM=cosine_similarity(X=train_data.T, Y=None)
         print('gen similarity is done')
 
         # STEP 2 - computing the laplacian
@@ -136,16 +137,18 @@ def main(args):
             Ws = sim_MXM.copy()
         elif args.graph_nodes=='U':
             Ws = sim_UXU.copy()
-
-        D = np.diag(np.sum(np.array(Ws), axis=1))
-        # laplacian matrix
-        L = D - Ws
+        L, D = calc_laplacian(args, Ws)
+        # D = np.diag(np.sum(np.array(Ws), axis=1))
+        # # laplacian matrix
+        # L = D - Ws
         print('calc laplacian is done')
 
         # STEP 3 - Compute the eigenvectors of the matrix L
-        D=np.diag(np.sum(Ws, axis=0))
-        vals, vecs = np.linalg.eig(L)
-        vecs = vecs.real
+        # D=np.diag(np.sum(Ws, axis=0))
+        # vals, vecs = np.linalg.eig(L)
+        # vecs = vecs.real
+        vals, vecs, v_norm = calc_eig(args, L, Ws)
+        print('calc eig is done')
 
         # sort these based on the eigenvalues
         vals = vals[np.argsort(vals)]
@@ -205,7 +208,7 @@ def main(args):
                 RMSEs_test[epch, ikk] = RMSE_ts
                 print('MSE test is:', MSE_ts)
                 print('RMSE test is:', RMSE_ts)
-                
+
                 if epch%25==0:
                     # Save errors
                     fn_str = args.RESULTPATH + 'sc_MSE_tr_%s_%s_%s_%s_epch%s.npy' \
