@@ -24,5 +24,6 @@ def gen_similarity(args, X):
     fn_str = args.RESULTPATH + 'sim_%s_MXM.npy' %(args.sim_method)
     with open(fn_str, 'wb') as f:
         pickle.dump(sim_MXM, f)
+    print('saving similarity matrix is done!')
     ## =====================================================================
     return sim_UXU, sim_MXM

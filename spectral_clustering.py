@@ -74,6 +74,7 @@ def main(args):
     # STEP 1 - Calculate similarity
     #===========================================================================
     sim_UXU, sim_MXM = gen_similarity(args, data)
+    print('gen similarity is done')
     #===========================================================================
     # STEP 2 - computing the laplacian
     # If the graph (W) has K connected components, then L has K eigenvectors
@@ -81,10 +82,12 @@ def main(args):
     #===========================================================================
     Ws = sim_MXM.copy()
     L, D = calc_laplacian(args, Ws)
+    print('calc laplacian is done')
     #===========================================================================
     # STEP 3 - Compute the eigenvectors of the matrix L
     #===========================================================================
     e, v, v_norm = calc_eig(args, L, Ws)
+    print('calc eigens is done')
     #===========================================================================
     # STEP 4 - Using the k smallest eigenvector as input,
     # train a k-means model and use it to classify the data
@@ -93,10 +96,12 @@ def main(args):
     km = KMeans(init='k-means++', n_clusters=args.kmeans_k)
     km.fit(U)
     print(km.labels_.shape)
+    print('calc kmeans is done')
     # Save labels
     fn_str = args.RESULTPATH + 'kmeans_obj_MXM_k%s_%s' %(args.kmeans_k, args.sim_method)
     with open(fn_str, 'wb') as f:
         pickle.dump(km, f)
+    print('saving kmenas is done')
     #===========================================================================
     # STEP 5 - using k centers to predict data
     #===========================================================================
