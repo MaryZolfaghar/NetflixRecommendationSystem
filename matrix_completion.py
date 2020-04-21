@@ -89,8 +89,8 @@ def main(args):
         print('-------------\nEpochs %s starts\n-------------' %epch)
         ir = np.random.permutation(nn)
 
-        ind0 = inds[0].copy()
-        ind1 = inds[1].copy()
+        inds0 = inds[0].copy()
+        inds1 = inds[1].copy()
 
         tst_ind0 = np.asarray([inds0[ir[i]] for i in range(num_test)])
         tst_ind1 = np.asarray([inds1[ir[i]] for i in range(num_test)])
