@@ -51,6 +51,10 @@ parser.add_argument('--n_epochs', type=int, default=100,
                     help='number of epochs')
 parser.add_argument('--test_prc', type=float, default=0.1,
                     help='percentage for test dataset')
+parser.add_argument('--graph_nodes', choices=['M','U'],
+                    default='M',
+                    help='the nodes to create graph was either movies or users')
+
 
 """
 main function
@@ -85,15 +89,21 @@ def main(args):
     # STEP 4 - Using the k smallest eigenvector as input,
     # train a k-means model and use it to classify the data
     #===========================================================================
-    n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 400, 500]
-    # n_k = [2, 10, 15, 20, 30]
+    if args.graph_nodes=='M':
+        n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 400, 500, 800, 1000, 2000, 10000, 16000]
+    elif args.graph_nodes=='U':
+        n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 400, 500, 800, 1000, 2000, 4000, 6000]
+
+
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
+    RMSEs_train = np.zeros((args.n_epochs, len(n_k)))
     MSEs_test = np.zeros((args.n_epochs, len(n_k)))
     RMSEs_test = np.zeros((args.n_epochs, len(n_k)))
 
     inds=np.nonzero(data_fill_zeros)
     nn=inds[0].shape[0]
     num_test = np.ceil(args.test_prc*nn).astype(int)
+    num_train = nn-num_test
 
     for epch in range(args.n_epochs):
 
@@ -106,55 +116,119 @@ def main(args):
         tst_ind0 = np.asarray([inds0[ir[i]] for i in range(num_test)])
         tst_ind1 = np.asarray([inds1[ir[i]] for i in range(num_test)])
 
+        tr_ind0 = np.asarray([inds0[ir[i+num_test]] for i in range(num_train)])
+        tr_ind1 = np.asarray([inds1[ir[i+num_test]] for i in range(num_train)])
+
         tst_trget = data[tst_ind0, tst_ind1].copy()
         train_data = data.copy()
+        print('train_data.shape', train_data.shape)
         train_data[tst_ind0, tst_ind1] = 0
+        trn_trget = train_data[tr_ind0, tr_ind1].copy()
 
         #===========================================================================
         # STEP 1 - Calculate similarity
-        sim_UXU, sim_MXM = gen_similarity(args, train_data)
+        sim_UXU=cosine_similarity(X=train_data, Y=None)
+        sim_MXM=cosine_similarity(X=train_data.T, Y=None)
         print('gen similarity is done')
+
         # STEP 2 - computing the laplacian
-        Ws = sim_MXM.copy()
-        L, D = calc_laplacian(args, Ws)
+        if args.graph_nodes=='M':
+            Ws = sim_MXM.copy()
+        elif args.graph_nodes=='U':
+            Ws = sim_UXU.copy()
+
+        D = np.diag(np.sum(np.array(Ws), axis=1))
+        # laplacian matrix
+        L = D - Ws
         print('calc laplacian is done')
+
         # STEP 3 - Compute the eigenvectors of the matrix L
-        e, v, v_norm = calc_eig(args, L, Ws)
+        D=np.diag(np.sum(Ws, axis=0))
+        vals, vecs = np.linalg.eig(L)
+        vecs = vecs.real
+
+        # sort these based on the eigenvalues
+        vals = vals[np.argsort(vals)]
+        vals = vals[1:]
+        vecs = vecs[:,np.argsort(vals)]
         print('calc eigens is done')
 
         for ikk, kk in enumerate(n_k):
+                num_clusters=kk
                 time_start=time.time()
                 print('k: ', kk)
                 print('ikk:', ikk)
                 # STEP 5 - using k centers to predict data
-                U = np.array(v)
-                km = KMeans(init='k-means++', n_clusters=args.kmeans_k)
+                U = np.array(vecs)
+                km = KMeans(init='k-means++', n_clusters=kk)
                 km.fit(U)
-                # print('km.labels_.shape', km.labels_.shape)
-                # pred_ratings = km.labels_
-                # print('pred_ratings time elapsed: {} sec'.format(time.time()-time_start))
+                print('km.labels_.shape', km.labels_.shape)
+                if graph_nodes=='M': # menas the sim is MXM
+                    pred_ratings = np.zeros(train_data.shape[1])
+                    for ic in range(train_data.shape[1]):
+                        ctst = km.labels_[ic]
+                        indctst = km.labels_[km.labels_==ctst]
+                        trdata = train_data[:,km.labels_==ctst]
+                        trdata = np.mean(trdata,axis=0)
+                        pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
 
-                # err = (pred_ratings[tst_ind0, tst_ind1] - tst_trget)**2
-                # MSE = np.mean(err)
-                # RMSE = np.sqrt(MSE)
-                # MSEs_test[epch, ikk] = MSE
-                # RMSEs_test[epch, ikk] = RMSE
-                # print('MSE is:', MSE)
-                # print('RMSE is:', RMSE)
-                if epch%5==0:
-                #     # Save errors
-                #     fn_str = args.RESULTPATH + 'mc_MSE_epch%s.npy' %(epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(MSEs_test, f)
-                #     fn_str = args.RESULTPATH + 'mc_RMSE_epch%s.npy' %(epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(RMSEs_test, f)
-                #     # Save labels
-                    fn_str = args.RESULTPATH + 'kmeans_obj_MXM_k%s_%s_epch%s' \
-                            %(args.kmeans_k, args.sim_method, epch)
+                    pred_tst = pred_ratings[tst_ind1]
+                    pred_tr = pred_ratings[tr_ind1]
+
+                    err_tr = (pred_tr - trn_trget)**2
+                    err_ts = (pred_tst - tst_trget)**2
+                elif graph_nodes=='U': # menas the sim is UXU
+                    pred_ratings = np.zeros(train_data.shape[0])
+                    for ic in range(train_data.shape[0]):
+                        ctst = km.labels_[ic]
+                        indctst = km.labels_[km.labels_==ctst]
+                        trdata = train_data[:,km.labels_==ctst]
+                        trdata = np.mean(trdata,axis=0)
+                        pred_ratings[ic] = np.ceil(np.mean(trdata, axis=1))
+
+                    pred_tst = pred_ratings[tst_ind1]
+                    pred_tr = pred_ratings[tr_ind1]
+
+                    err_tr = (pred_tr - trn_trget)**2
+                    err_ts = (pred_tst - tst_trget)**2
+
+                MSE_tr = np.mean(err_tr)
+                RMSE_tr = np.sqrt(MSE)
+                MSEs_train[epch, ikk] = MSE_tr
+                RMSEs_train[epch, ikk] = RMSE_tr
+                print('MSE train is:', MSE_tr)
+                print('RMSE train is:', RMSE_tr)
+
+                MSE_ts = np.mean(err_ts)
+                RMSE_ts = np.sqrt(MSE_ts)
+                MSEs_test[epch, ikk] = MSE_ts
+                RMSEs_test[epch, ikk] = RMSE_ts
+                print('MSE test is:', MSE_ts)
+                print('RMSE test is:', RMSE_ts)
+                if epch%25==0:
+                    # Save errors
+                    fn_str = args.RESULTPATH + 'sc_MSE_tr_%s_%s_%s_%s_epch%s.npy' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
                     with open(fn_str, 'wb') as f:
-                        pickle.dump(km, f)
-                    print('saving kmenas is done')
+                        pickle.dump(MSEs_train, f)
+                    fn_str = args.RESULTPATH + 'sc_RMSE_tr_%s_%s_%s_%s_epch%s.npy' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(RMSEs_train, f)
+
+                    fn_str = args.RESULTPATH + 'sc_MSE_ts_%s_%s_%s_%s_epch%s.npy' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(MSEs_test, f)
+                    fn_str = args.RESULTPATH + 'sc_RMSE_ts_%s_%s_%s_%s_epch%s.npy' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(RMSEs_test, f)
+                    fn_str = args.RESULTPATH + 'sc_kmeans_obj_%s_%s_%s_%s_epch%s' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                            pickle.dump(km, f)
+                    print('saving in spectral clustering is done')
 
 """
 ==============================================================================

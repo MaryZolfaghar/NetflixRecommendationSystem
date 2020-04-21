@@ -14,19 +14,19 @@ def calc_eig(args, L, Ws):
     D=np.diag(np.sum(Ws, axis=0))
     vol=np.sum(np.diag(D))
 
-    e, v = np.linalg.eig(L)
-    v = v.real
+    vals, vecs = np.linalg.eig(L)
+    vecs = vecs.real
     # eigenvalues
     print('eigenvalues:')
-    print(e.shape)
+    print(vals.shape)
     # eigenvectors
     print('eigenvectors:')
-    print(v.shape)
+    print(vecs.shape)
     if args.normalize_laplacian:
-        Y = np.sort(e)
-        I = np.argsort(e)
-        v_norm = v[:,I[:args.norm_laplacian_k]] \
-            / LA.norm(v[:,I[:args.norm_laplacian_k]])*vol**(1/2)
+        Y = np.sort(vals)
+        I = np.argsort(vals)
+        v_norm = vecs[:,I[:args.norm_laplacian_k]] \
+            / LA.norm(vecs[:,I[:args.norm_laplacian_k]])*vol**(1/2)
     else:
         v_norm = []
-    return e, v, v_norm
+    return vals, vecs, v_norm

@@ -49,6 +49,9 @@ parser.add_argument('--n_epochs', type=int, default=100,
                     help='number of epochs')
 parser.add_argument('--test_prc', type=float, default=0.1,
                     help='percentage for test dataset')
+parser.add_argument('--graph_nodes', choices=['M','U'],
+                    default='M',
+                    help='the nodes to create graph was either movies or users')
 
 """
 main function
@@ -80,15 +83,17 @@ def main(args):
     #===========================================================================
     # STEP
     #===========================================================================
-    n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 400, 500]
-    # n_k = [2, 10, 15, 20, 30]
+    n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 400, 500, 800, 1000, 2000, 4000, 6000]
+
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
+    RMSEs_train = np.zeros((args.n_epochs, len(n_k)))
     MSEs_test = np.zeros((args.n_epochs, len(n_k)))
     RMSEs_test = np.zeros((args.n_epochs, len(n_k)))
 
     inds=np.nonzero(data_fill_zeros)
     nn=inds[0].shape[0]
     num_test = np.ceil(args.test_prc*nn).astype(int)
+    num_train = nn-num_test
 
     for epch in range(args.n_epochs):
 
@@ -101,36 +106,62 @@ def main(args):
         tst_ind0 = np.asarray([inds0[ir[i]] for i in range(num_test)])
         tst_ind1 = np.asarray([inds1[ir[i]] for i in range(num_test)])
 
+        tr_ind0 = np.asarray([inds0[ir[i+num_test]] for i in range(num_train)])
+        tr_ind1 = np.asarray([inds1[ir[i+num_test]] for i in range(num_train)])
+
         tst_trget = data[tst_ind0, tst_ind1].copy()
         train_data = data.copy()
+        print('train_data.shape', train_data.shape)
         train_data[tst_ind0, tst_ind1] = 0
+        trn_trget = train_data[tr_ind0, tr_ind1].copy()
 
         for ikk, kk in enumerate(n_k):
                 time_start=time.time()
                 print('k: ', kk)
                 print('ikk:', ikk)
 
-                U, sigmaTmp, Vt = svds(data, k = kk)
+                U, sigmaTmp, Vt = svds(train_data, k = kk)
                 sigma = np.zeros([sigmaTmp.shape[0], sigmaTmp.shape[0]])
                 np.fill_diagonal(sigma, sigmaTmp)
                 pred_ratings = np.dot(np.dot(U, sigma), Vt)
                 print('pred_ratings time elapsed: {} sec'.format(time.time()-time_start))
 
-                err = (pred_ratings[tst_ind0, tst_ind1] - tst_trget)**2
-                MSE = np.mean(err)
-                RMSE = np.sqrt(MSE)
-                MSEs_test[epch, ikk] = MSE
-                RMSEs_test[epch, ikk] = RMSE
-                print('MSE is:', MSE)
-                print('RMSE is:', RMSE)
-                if epch%5==0:
+                err_tr = (pred_ratings[tr_ind0, tr_ind1] - trn_trget)**2
+                err_ts = (pred_ratings[tst_ind0, tst_ind1] - tst_trget)**2
+
+                MSE_tr = np.mean(err_tr)
+                RMSE_tr = np.sqrt(MSE)
+                MSEs_train[epch, ikk] = MSE_tr
+                RMSEs_train[epch, ikk] = RMSE_tr
+                print('MSE train is:', MSE_tr)
+                print('RMSE train is:', RMSE_tr)
+
+                MSE_ts = np.mean(err_ts)
+                RMSE_ts = np.sqrt(MSE_ts)
+                MSEs_test[epch, ikk] = MSE_ts
+                RMSEs_test[epch, ikk] = RMSE_ts
+                print('MSE test is:', MSE_ts)
+                print('RMSE test is:', RMSE_ts)
+                 if epch%25==0:
                     # Save errors
-                    fn_str = args.RESULTPATH + 'mc_MSE_epch%s.npy' %(epch)
+                    fn_str = args.RESULTPATH + 'mc_MSE_tr_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(MSEs_train, f)
+                    fn_str = args.RESULTPATH + 'mc_RMSE_tr_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(RMSEs_train, f)
+
+                    fn_str = args.RESULTPATH + 'mc_MSE_ts_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
                     with open(fn_str, 'wb') as f:
                         pickle.dump(MSEs_test, f)
-                    fn_str = args.RESULTPATH + 'mc_RMSE_epch%s.npy' %(epch)
+                    fn_str = args.RESULTPATH + 'mc_RMSE_ts_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
                     with open(fn_str, 'wb') as f:
                         pickle.dump(RMSEs_test, f)
+                    print('saving in matrix completion is done')
 """
 ==============================================================================
 Main
