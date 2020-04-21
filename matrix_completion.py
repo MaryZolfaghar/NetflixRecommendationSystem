@@ -112,7 +112,7 @@ def main(args):
                 pred_ratings = np.dot(np.dot(U, sigma), Vt)
                 print('pred_ratings time elapsed: {} sec'.format(time.time()-time_start))
 
-                err = (train_data[tst_ind0, tst_ind1] - data[tst_ind0, tst_ind1])**2
+                err = (pred_ratings - tst_trget)**2
                 MSE = np.mean(err)
                 RMSE = np.sqrt(MSE)
                 MSEs_test[epch, ikk] = MSE
@@ -121,10 +121,10 @@ def main(args):
                 print('RMSE is:', RMSE)
                 if epch%5==0:
                     # Save errors
-                    fn_str = args.RESULTPATH + 'mc_MSE_epch%s' %(epch)
+                    fn_str = args.RESULTPATH + 'mc_MSE_epch%s.npy' %(epch)
                     with open(fn_str, 'wb') as f:
                         pickle.dump(MSEs_test, f)
-                    fn_str = args.RESULTPATH + 'mc_RMSE_epch%s' %(epch)
+                    fn_str = args.RESULTPATH + 'mc_RMSE_epch%s.npy' %(epch)
                     with open(fn_str, 'wb') as f:
                         pickle.dump(RMSEs_test, f)
 """
