@@ -130,7 +130,7 @@ def main(args):
                 err_ts = (pred_ratings[tst_ind0, tst_ind1] - tst_trget)**2
 
                 MSE_tr = np.mean(err_tr)
-                RMSE_tr = np.sqrt(MSE)
+                RMSE_tr = np.sqrt(MSE_tr)
                 MSEs_train[epch, ikk] = MSE_tr
                 RMSEs_train[epch, ikk] = RMSE_tr
                 print('MSE train is:', MSE_tr)
