@@ -126,26 +126,26 @@ def main(args):
                 U = np.array(v)
                 km = KMeans(init='k-means++', n_clusters=args.kmeans_k)
                 km.fit(U)
-                print('km.labels_.shape', km.labels_.shape)
-                pred_ratings = km.labels_
-                print('pred_ratings time elapsed: {} sec'.format(time.time()-time_start))
+                # print('km.labels_.shape', km.labels_.shape)
+                # pred_ratings = km.labels_
+                # print('pred_ratings time elapsed: {} sec'.format(time.time()-time_start))
 
-                err = (pred_ratings[tst_ind0, tst_ind1] - tst_trget)**2
-                MSE = np.mean(err)
-                RMSE = np.sqrt(MSE)
-                MSEs_test[epch, ikk] = MSE
-                RMSEs_test[epch, ikk] = RMSE
-                print('MSE is:', MSE)
-                print('RMSE is:', RMSE)
+                # err = (pred_ratings[tst_ind0, tst_ind1] - tst_trget)**2
+                # MSE = np.mean(err)
+                # RMSE = np.sqrt(MSE)
+                # MSEs_test[epch, ikk] = MSE
+                # RMSEs_test[epch, ikk] = RMSE
+                # print('MSE is:', MSE)
+                # print('RMSE is:', RMSE)
                 if epch%5==0:
-                    # Save errors
-                    fn_str = args.RESULTPATH + 'mc_MSE_epch%s.npy' %(epch)
-                    with open(fn_str, 'wb') as f:
-                        pickle.dump(MSEs_test, f)
-                    fn_str = args.RESULTPATH + 'mc_RMSE_epch%s.npy' %(epch)
-                    with open(fn_str, 'wb') as f:
-                        pickle.dump(RMSEs_test, f)
-                    # Save labels
+                #     # Save errors
+                #     fn_str = args.RESULTPATH + 'mc_MSE_epch%s.npy' %(epch)
+                #     with open(fn_str, 'wb') as f:
+                #         pickle.dump(MSEs_test, f)
+                #     fn_str = args.RESULTPATH + 'mc_RMSE_epch%s.npy' %(epch)
+                #     with open(fn_str, 'wb') as f:
+                #         pickle.dump(RMSEs_test, f)
+                #     # Save labels
                     fn_str = args.RESULTPATH + 'kmeans_obj_MXM_k%s_%s_epch%s' \
                             %(args.kmeans_k, args.sim_method, epch)
                     with open(fn_str, 'wb') as f:
