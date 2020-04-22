@@ -65,18 +65,17 @@ def main(args):
 
     #===========================================================================
     # use a subset of data just for testing everything first
-    # nu=100 # number of users
-    # ni=200 # number of items
-    # A_temp = A.copy()
-    # data = A_temp[:nu,:ni] # small 10 X 20 submatrix
-    # print(data.shape)
-    #
-    # A_temp = A_fill_zeros.copy()
-    # data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
-    # print(data_fill_zeros.shape)
+    nu=100 # number of users
+    ni=200 # number of items
+    A_temp = A.copy()
+    data = A_temp[:nu,:ni] # small 10 X 20 submatrix
+    print(data.shape)
 
-    data = A.copy()
-    data_fill_zeros = A_fill_zeros.copy()
+    A_temp = A_fill_zeros.copy()
+    data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
+
+    # data = A.copy()
+    # data_fill_zeros = A_fill_zeros.copy()
     print('data shape is:', data.shape)
     print('data fill zero shape is:', data_fill_zeros.shape)
     #===========================================================================
@@ -171,12 +170,11 @@ def main(args):
                 km = KMeans(init='k-means++', n_clusters=kk)
                 km.fit(U)
 
-                if graph_nodes=='M': # menas the sim is MXM
+                if args.graph_nodes=='M': # menas the sim is MXM
                     pred_ratings = np.zeros(train_data.shape[1])
                     for ic in range(train_data.shape[1]):
                         ctst = km.labels_[ic]
                         indctst = km.labels_[km.labels_==ctst]
-
                         dfz=data_fill_zeros[:,km.labels_==ctst].copy()
                         # find user that rated at least one of the movies
                         goodU= np.mean(dfz, axis=1)
@@ -187,49 +185,42 @@ def main(args):
                             trdata = trdata[indxgu[0], :]
                         else:
                             trdata = train_data[:, km.labels_==ctst]
-
-
                         trdata = np.mean(trdata,axis=0)
                         pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
 
-                    pred_tst = pred_ratings[tst_ind1]
-                    pred_tr = pred_ratings[tr_ind1]
-
-                    err_tr = (pred_tr - trn_trget)**2
-                    err_ts = (pred_tst - tst_trget)**2
-                elif graph_nodes=='U': # menas the sim is UXU
+                elif args.graph_nodes=='U': # menas the sim is UXU
                     pred_ratings = np.zeros(train_data.shape[0])
                     for ic in range(train_data.shape[0]):
                         ctst = km.labels_[ic]
                         indctst = km.labels_[km.labels_==ctst]
-                        trdata = train_data[:,km.labels_==ctst]
-                        trdata = np.mean(trdata,axis=0)
+                        trdata = train_data[km.labels_==ctst, :]
+                        trdata = np.mean(trdata,axis=1)
                         pred_ratings[ic] = np.ceil(np.mean(trdata, axis=1))
 
-                    pred_tst = pred_ratings[tst_ind1]
-                    pred_tr = pred_ratings[tr_ind1]
+                pred_tst = pred_ratings[tst_ind1]
+                pred_tr = pred_ratings[tr_ind1]
 
-                    err_tr = (pred_tr - trn_trget)**2
-                    err_ts = (pred_tst - tst_trget)**2
+                err_tr = (pred_tr - trn_trget)**2
+                err_ts = (pred_tst - tst_trget)**2
 
-                    diff_tr = (pred_tr - trn_trget)
-                    incorrect_tr = np.nonzero(diff_tr)[0]
-                    count_correct_tr = diff_tr.shape[0] - incorrect_tr.shape[0]
-                    prc_correct_tr = count_correct_tr/diff_tr.shape[0]
-                    counts_corr_train[epch, ikk] = count_correct_tr
-                    prc_correct_train[epch, ikk] = prc_correct_tr
-                    print('count correct train ', count_correct_tr)
-                    print('percentage correct train ', prc_correct_tr)
+                diff_tr = (pred_tr - trn_trget)
+                incorrect_tr = np.nonzero(diff_tr)[0]
+                count_correct_tr = diff_tr.shape[0] - incorrect_tr.shape[0]
+                prc_correct_tr = count_correct_tr/diff_tr.shape[0]
+                counts_corr_train[epch, ikk] = count_correct_tr
+                prc_correct_train[epch, ikk] = prc_correct_tr
+                print('count correct train ', count_correct_tr)
+                print('percentage correct train ', prc_correct_tr)
 
 
-                    diff_ts = (pred_tst - tst_trget)
-                    incorrect_ts = np.nonzero(diff_ts)[0]
-                    count_correct_ts = diff_ts.shape[0] - incorrect_ts.shape[0]
-                    prc_correct_ts = count_correct_ts/diff_ts.shape[0]
-                    counts_corr_test[epch, ikk] = count_correct_ts
-                    prc_correct_test[epch, ikk] = prc_correct_ts
-                    print('count correct test ', count_correct_tr)
-                    print('percentage correct test ', prc_correct_tr)
+                diff_ts = (pred_tst - tst_trget)
+                incorrect_ts = np.nonzero(diff_ts)[0]
+                count_correct_ts = diff_ts.shape[0] - incorrect_ts.shape[0]
+                prc_correct_ts = count_correct_ts/diff_ts.shape[0]
+                counts_corr_test[epch, ikk] = count_correct_ts
+                prc_correct_test[epch, ikk] = prc_correct_ts
+                print('count correct test ', count_correct_tr)
+                print('percentage correct test ', prc_correct_tr)
 
                 MSE_tr = np.mean(err_tr)
                 RMSE_tr = np.sqrt(MSE_tr)

@@ -62,17 +62,17 @@ def main(args):
 
     #===========================================================================
     # # use a subset of data just for testing everything first
-    # nu=100 # number of users
-    # ni=200 # number of items
-    # A_temp = A.copy()
-    # data = A_temp[:nu,:ni] # small 10 X 20 submatrix
-    # print(data.shape)
-    #
-    # A_temp = A_fill_zeros.copy()
-    # data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
-    # print(data_fill_zeros.shape)
-    data = A.copy()
-    data_fill_zeros = A_fill_zeros.copy()
+    nu=100 # number of users
+    ni=200 # number of items
+    A_temp = A.copy()
+    data = A_temp[:nu,:ni] # small 10 X 20 submatrix
+    print(data.shape)
+
+    A_temp = A_fill_zeros.copy()
+    data_fill_zeros = A_temp[:nu,:ni] # small 10 X 20 submatrix
+
+    # data = A.copy()
+    # data_fill_zeros = A_fill_zeros.copy()
     print('data shape is:', data.shape)
     print('data fill zero shape is:', data_fill_zeros.shape)
     #===========================================================================
