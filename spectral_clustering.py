@@ -159,8 +159,10 @@ def main(args):
         vals = vals[1:]
         vecs = vecs[:,np.argsort(vals)]
         print('shape pf eigen values', vals.shape)
+        print('eigen values:', vals)
         print('shape pf eigen vectors', vecs.shape)
         print('calc eigens is done')
+        print('\n')
 
         for ikk, kk in enumerate(n_k):
                 num_clusters=kk
