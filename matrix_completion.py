@@ -91,10 +91,10 @@ def main(args):
     MSEs_test = np.zeros((args.n_epochs, len(n_k)))
     RMSEs_test = np.zeros((args.n_epochs, len(n_k)))
 
-    counts_corr_train = np.zeros((n_epochs, len(n_k)))
-    counts_corr_test = np.zeros((n_epochs, len(n_k)))
-    prc_correct_train = np.zeros((n_epochs, len(n_k)))
-    prc_correct_test = np.zeros((n_epochs, len(n_k)))
+    counts_corr_train = np.zeros((args.n_epochs, len(n_k)))
+    counts_corr_test = np.zeros((args.n_epochs, len(n_k)))
+    prc_correct_train = np.zeros((args.n_epochs, len(n_k)))
+    prc_correct_test = np.zeros((args.n_epochs, len(n_k)))
 
     inds=np.nonzero(data_fill_zeros)
     nn=inds[0].shape[0]
