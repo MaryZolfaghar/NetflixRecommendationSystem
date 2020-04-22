@@ -47,7 +47,7 @@ parser.add_argument('--kmeans_k', type=int, default=5,
                     help='number of clusters in kmeans')
 
 # train
-parser.add_argument('--n_epochs', type=int, default=100,
+parser.add_argument('--n_epochs', type=int, default=10,
                     help='number of epochs')
 parser.add_argument('--test_prc', type=float, default=0.1,
                     help='percentage for test dataset')
@@ -90,9 +90,9 @@ def main(args):
     # train a k-means model and use it to classify the data
     #===========================================================================
     if args.graph_nodes=='M':
-        n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 400, 500, 800, 1000, 2000, 10000, 16000]
+        n_k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40]
     elif args.graph_nodes=='U':
-        n_k = [2, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 400, 500, 800, 1000, 2000, 4000, 6000]
+        n_k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40]
 
 
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
