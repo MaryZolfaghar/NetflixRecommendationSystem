@@ -85,9 +85,9 @@ def read_preprocss_data(args):
         # try to add movie titles to the train data, seems this takes long so skip for now
         titles=[]
         years=[]
-        print(trnp.shape)
+        # print(trnp.shape)
         for itr in range(trnp.shape[0]):
-            if (itr%1000==0):
+            if (itr%10000==0):
                 print(itr)
             aa=trnp[itr,0]
             mm = movie_titles[movie_titles.movie_id == str(aa)]
@@ -95,7 +95,7 @@ def read_preprocss_data(args):
             years.append(mm.year_produced.to_string())
 
         titles = np.asarray(titles)
-        print(titles.shape)
+        # print(titles.shape)
         train_metadata['title'] = titles
         train_metadata['year_produced'] = years
         print('done with creating metadata')
@@ -104,5 +104,5 @@ def read_preprocss_data(args):
         fn_str = args.DATAPATH + 'train_metadata.csv'
         with open(fn_str, 'wb') as f:
             pickle.dump(train_metadata, f)
-        print('done with creating metadata')
+        print('done with savind metadata')
     return df, A, A_fill_zeros
