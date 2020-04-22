@@ -158,6 +158,8 @@ def main(args):
         vals = vals[np.argsort(vals)]
         vals = vals[1:]
         vecs = vecs[:,np.argsort(vals)]
+        print('shape pf eigen values', vals.shape)
+        print('shape pf eigen vectors', vecs.shape)
         print('calc eigens is done')
 
         for ikk, kk in enumerate(n_k):
