@@ -45,7 +45,7 @@ parser.add_argument('--kmeans_k', type=int, default=5,
                     help='number of clusters in kmeans')
 
 # train
-parser.add_argument('--n_epochs', type=int, default=10,
+parser.add_argument('--n_epochs', type=int, default=100,
                     help='number of epochs')
 parser.add_argument('--test_prc', type=float, default=0.1,
                     help='percentage for test dataset')
