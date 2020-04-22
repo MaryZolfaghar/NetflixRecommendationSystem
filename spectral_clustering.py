@@ -35,7 +35,7 @@ parser.add_argument('--fillnan', choices=['mean_row','mean_col'],
 
 # Similarity
 parser.add_argument('--sim_method', choices=['sigmoid_kernel','cosine_similarity'],
-                    default='sigmoid_kernel',
+                    default='cosine_similarity',
                     help='What type of similarity method should use')
 # Spectral clustering
 parser.add_argument('--norm_laplacian_k', type=int, default=5,
