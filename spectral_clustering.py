@@ -100,6 +100,11 @@ def main(args):
     MSEs_test = np.zeros((args.n_epochs, len(n_k)))
     RMSEs_test = np.zeros((args.n_epochs, len(n_k)))
 
+    counts_corr_train = np.zeros((n_epochs, len(n_k)))
+    counts_corr_test = np.zeros((n_epochs, len(n_k)))
+    prc_correct_train = np.zeros((n_epochs, len(n_k)))
+    prc_correct_test = np.zeros((n_epochs, len(n_k)))
+
     inds=np.nonzero(data_fill_zeros)
     nn=inds[0].shape[0]
     num_test = np.ceil(args.test_prc*nn).astype(int)
@@ -174,7 +179,7 @@ def main(args):
 
                         dfz=data_fill_zeros[:,km.labels_==ctst].copy()
                         # find user that rated at least one of the movies
-                        goodU= np.mean(dfz, axis=1) 
+                        goodU= np.mean(dfz, axis=1)
                         # trdata = train_data[:,km.labels_==ctst]
                         if goodU.shape[0] > 0:
                             indxgu=np.where(goodU > 0) # index for users that rate at least one of the movies in that clustr
@@ -207,6 +212,25 @@ def main(args):
                     err_tr = (pred_tr - trn_trget)**2
                     err_ts = (pred_tst - tst_trget)**2
 
+                    diff_tr = (pred_tr - trn_trget)
+                    incorrect_tr = np.nonzero(diff_tr)[0]
+                    count_correct_tr = diff_tr.shape[0] - incorrect_tr.shape[0]
+                    prc_correct_tr = count_correct_tr/diff_tr.shape[0]
+                    counts_corr_train[epch, ikk] = count_correct_tr
+                    prc_correct_train[epch, ikk] = prc_correct_tr
+                    print('count correct train ', count_correct_tr)
+                    print('percentage correct train ', prc_correct_tr)
+
+
+                    diff_ts = (pred_tst - tst_trget)
+                    incorrect_ts = np.nonzero(diff_ts)[0]
+                    count_correct_ts = diff_ts.shape[0] - incorrect_ts.shape[0]
+                    prc_correct_ts = count_correct_ts/diff_ts.shape[0]
+                    counts_corr_test[epch, ikk] = count_correct_ts
+                    prc_correct_test[epch, ikk] = prc_correct_ts
+                    print('count correct test ', count_correct_tr)
+                    print('percentage correct test ', prc_correct_tr)
+
                 MSE_tr = np.mean(err_tr)
                 RMSE_tr = np.sqrt(MSE_tr)
                 MSEs_train[epch, ikk] = MSE_tr
@@ -227,6 +251,7 @@ def main(args):
                     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
                     with open(fn_str, 'wb') as f:
                         pickle.dump(MSEs_train, f)
+
                     fn_str = args.RESULTPATH + 'sc_RMSE_tr_%s_%s_%s_%s_epch%s.npy' \
                     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
                     with open(fn_str, 'wb') as f:
@@ -236,14 +261,37 @@ def main(args):
                     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
                     with open(fn_str, 'wb') as f:
                         pickle.dump(MSEs_test, f)
+
                     fn_str = args.RESULTPATH + 'sc_RMSE_ts_%s_%s_%s_%s_epch%s.npy' \
                     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
                     with open(fn_str, 'wb') as f:
                         pickle.dump(RMSEs_test, f)
+
                     fn_str = args.RESULTPATH + 'sc_kmeans_obj_%s_%s_%s_%s_epch%s' \
                     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
                     with open(fn_str, 'wb') as f:
                             pickle.dump(km, f)
+
+                    #
+                    fn_str = args.RESULTPATH + 'sc_cnt_corr_tr_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(counts_corr_train, f)
+
+                    fn_str = args.RESULTPATH + 'sc_cnt_corr_ts_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(counts_corr_test, f)
+
+                    fn_str = args.RESULTPATH + 'sc_prc_corr_tr_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(prc_correct_train, f)
+
+                    fn_str = args.RESULTPATH + 'sc_prc_corr_ts_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(prc_correct_test, f)
                     print('saving in spectral clustering is done')
 
 """
