@@ -12,4 +12,5 @@ conda activate /home/mazlfghr/.conda/envs/MLprj
 
 echo "Process matrix_completion starts"
 
-python matrix_completion.py
+python matrix_completion.py \
+--metadata \
