@@ -158,9 +158,9 @@ def main(args):
         vals = vals[np.argsort(vals)]
         vals = vals[1:]
         vecs = vecs[:,np.argsort(vals)]
-        print('shape pf eigen values', vals.shape)
-        print('eigen values:', vals)
-        print('shape pf eigen vectors', vecs.shape)
+        # print('shape pf eigen values', vals.shape)
+        # print('eigen values:', vals)
+        # print('shape pf eigen vectors', vecs.shape)
         print('calc eigens is done')
         print('\n')
 
@@ -199,7 +199,7 @@ def main(args):
                         indctst = km.labels_[km.labels_==ctst]
                         trdata = train_data[km.labels_==ctst, :]
                         trdata = np.mean(trdata,axis=1)
-                        pred_ratings[ic] = np.ceil(np.mean(trdata, axis=1))
+                        pred_ratings[ic] = np.ceil(np.mean(trdata, axis=0))
 
                 pred_tst = pred_ratings[tst_ind1]
                 pred_tr = pred_ratings[tr_ind1]
