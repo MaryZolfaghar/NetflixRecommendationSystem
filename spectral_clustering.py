@@ -165,13 +165,25 @@ def main(args):
                 U = np.array(vecs)
                 km = KMeans(init='k-means++', n_clusters=kk)
                 km.fit(U)
-                print('km.labels_.shape', km.labels_.shape)
+
                 if graph_nodes=='M': # menas the sim is MXM
                     pred_ratings = np.zeros(train_data.shape[1])
                     for ic in range(train_data.shape[1]):
                         ctst = km.labels_[ic]
                         indctst = km.labels_[km.labels_==ctst]
-                        trdata = train_data[:,km.labels_==ctst]
+
+                        dfz=data_fill_zeros[:,km.labels_==ctst].copy()
+                        # find user that rated at least one of the movies
+                        goodU= np.mean(dfz, axis=1) 
+                        # trdata = train_data[:,km.labels_==ctst]
+                        if goodU.shape[0] > 0:
+                            indxgu=np.where(goodU > 0) # index for users that rate at least one of the movies in that clustr
+                            trdata = train_data[:, km.labels_==ctst]
+                            trdata = trdata[indxgu[0], :]
+                        else:
+                            trdata = train_data[:, km.labels_==ctst]
+
+
                         trdata = np.mean(trdata,axis=0)
                         pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
 
