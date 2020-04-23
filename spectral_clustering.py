@@ -151,27 +151,28 @@ def main(args):
         # D=np.diag(np.sum(Ws, axis=0))
         # vals, vecs = np.linalg.eig(L)
         # vecs = vecs.real
-        vals, vecs, v_norm = calc_eig(args, L, Ws)
-        print('calc eig is done')
+        # vals, vecs, v_norm = calc_eig(args, L, Ws)
+        # print('calc eig is done')
 
         # sort these based on the eigenvalues
-        vals = vals[np.argsort(vals)]
-        vals = vals[1:]
-        vecs = vecs[:,np.argsort(vals)]
+        # vals = vals[np.argsort(vals)]
+        # vals = vals[1:]
+        # vecs = vecs[:,np.argsort(vals)]
         # print('shape pf eigen values', vals.shape)
         # print('eigen values:', vals)
         # print('shape pf eigen vectors', vecs.shape)
-        print('calc eigens is done')
-        print('\n')
+        # print('calc eigens is done')
+        # print('\n')
 
         for ikk, kk in enumerate(n_k):
                 num_clusters=kk
                 time_start=time.time()
                 print('k: ', kk)
                 print('ikk:', ikk)
+                vals, vecs, v_norm = calc_eig(args, L, Ws, kk)
                 # STEP 5 - using k centers to predict data
                 U = np.array(vecs)
-                U = U[:,:kk]
+                print('U array eigenvectors shape:', U.shape)
                 km = KMeans(init='k-means++', n_clusters=kk)
                 km.fit(U)
 
