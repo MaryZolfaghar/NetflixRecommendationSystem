@@ -171,6 +171,7 @@ def main(args):
                 print('ikk:', ikk)
                 # STEP 5 - using k centers to predict data
                 U = np.array(vecs)
+                U = U[:,:k]
                 km = KMeans(init='k-means++', n_clusters=kk)
                 km.fit(U)
 
