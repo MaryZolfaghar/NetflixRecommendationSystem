@@ -170,9 +170,8 @@ def main(args):
 
                 if args.graph_nodes=='M': # menas the sim is MXM
                     pred_ratings = np.zeros(train_data.shape[1])
+                    t0=time.time()
                     for ic in range(train_data.shape[1]):
-                        t1=time.time()
-
                         ctst = km.labels_[ic]
                         indctst = km.labels_[km.labels_==ctst]
                         dfz=data_fill_zeros[:,km.labels_==ctst].copy()
@@ -190,7 +189,7 @@ def main(args):
                         pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
                         if ic%50==0:
                             print('interation for finding clusters (ic)', ic)
-                            print('Epalsed time: {} sec'.format(time.time()-t1))
+                            print('Epalsed time: {} sec'.format(time.time()-t0))
                             print('\n')
                 elif args.graph_nodes=='U': # menas the sim is UXU
                     pred_ratings = np.zeros(train_data.shape[0])
