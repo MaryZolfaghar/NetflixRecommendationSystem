@@ -42,8 +42,8 @@ parser.add_argument('--norm_laplacian_k', type=int, default=5,
                     help='k in laplacian normalization and its eigen vector clustering')
 parser.add_argument('--normalize_laplacian', action='store_true',
                     help='whether normalize laplacian or not')
-parser.add_argument('--affinity_method', choices=['rbf','cosine_similarity'],
-                    default='cosine_similarity',
+parser.add_argument('--affinity_method', choices=['rbf','cosine'],
+                    default='cosine',
                     help='What type of similarity method should use in SpectralClustering')
 # Kmeans
 parser.add_argument('--kmeans_k', type=int, default=5,
