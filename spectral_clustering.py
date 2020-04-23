@@ -191,6 +191,12 @@ def main(args):
                             print('interation for finding clusters (ic)', ic)
                             print('Epalsed time: {} sec'.format(time.time()-t0))
                             print('\n')
+                    print('start calculating the error')
+                    t1=time.time()
+                    pred_tst = pred_ratings[tst_ind1]
+                    pred_tr = pred_ratings[tr_ind1]
+                    print('Done calc err time: {} sec'.format(time.time()-t1))
+
                 elif args.graph_nodes=='U': # menas the sim is UXU
                     pred_ratings = np.zeros(train_data.shape[0])
                     for ic in range(train_data.shape[0]):
@@ -199,13 +205,14 @@ def main(args):
                         trdata = train_data[km.labels_==ctst, :]
                         trdata = np.mean(trdata,axis=1)
                         pred_ratings[ic] = np.ceil(np.mean(trdata, axis=0))
-                print('start calculating the error')
-                t1=time.time()
-                pred_tst = pred_ratings[tst_ind1]
-                pred_tr = pred_ratings[tr_ind1]
+                    print('start calculating the error')
+                    t1=time.time()
+                    pred_tst = pred_ratings[tst_ind0]
+                    pred_tr = pred_ratings[tr_ind0]
+                    print('Done calc err time: {} sec'.format(time.time()-t1))
+
                 err_tr = (pred_tr - trn_trget)**2
                 err_ts = (pred_tst - tst_trget)**2
-                print('Done calc err time: {} sec'.format(time.time()-t1))
 
                 t1=time.time()
                 diff_tr = (pred_tr - trn_trget)
