@@ -89,9 +89,9 @@ def main(args):
     # train a k-means model and use it to classify the data
     #===========================================================================
     if args.graph_nodes=='M':
-        n_k = [3, 4, 5, 10]
+        n_k = [5, 50, 100]
     elif args.graph_nodes=='U':
-        n_k = [3, 4, 5, 10]
+        n_k = [5, 50, 100]
 
 
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
@@ -132,8 +132,6 @@ def main(args):
         #===========================================================================
         # STEP 1 - Calculate similarity
         sim_UXU, sim_MXM = gen_similarity(args, train_data)
-        # sim_UXU=cosine_similarity(X=train_data, Y=None)
-        # sim_MXM=cosine_similarity(X=train_data.T, Y=None)
         print('gen similarity is done')
 
         # STEP 2 - computing the laplacian
@@ -142,34 +140,21 @@ def main(args):
         elif args.graph_nodes=='U':
             Ws = sim_UXU.copy()
         L, D = calc_laplacian(args, Ws)
-        # D = np.diag(np.sum(np.array(Ws), axis=1))
-        # # laplacian matrix
-        # L = D - Ws
         print('calc laplacian is done')
-
-        # STEP 3 - Compute the eigenvectors of the matrix L
-        # D=np.diag(np.sum(Ws, axis=0))
-        # vals, vecs = np.linalg.eig(L)
-        # vecs = vecs.real
-        # vals, vecs, v_norm = calc_eig(args, L, Ws)
-        # print('calc eig is done')
-
-        # sort these based on the eigenvalues
-        # vals = vals[np.argsort(vals)]
-        # vals = vals[1:]
-        # vecs = vecs[:,np.argsort(vals)]
-        # print('shape pf eigen values', vals.shape)
-        # print('eigen values:', vals)
-        # print('shape pf eigen vectors', vecs.shape)
-        # print('calc eigens is done')
-        # print('\n')
 
         for ikk, kk in enumerate(n_k):
                 num_clusters=kk
                 time_start=time.time()
                 print('k: ', kk)
                 print('ikk:', ikk)
-                vals, vecs, v_norm = calc_eig(args, L, Ws, 200)
+                # STEP 3 - Compute the eigenvectors of the matrix L
+                vals, vecs, v_norm, eigengap = calc_eig(args, L, Ws, kk)
+                if epch%5==0:
+                    fn_str = args.RESULTPATH + 'sc_eigengap_%s_%s_%s_k%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, kk, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(eigengap, f)
+
                 # STEP 5 - using k centers to predict data
                 U = np.array(vecs)
                 # U = U[:,:200]
@@ -254,7 +239,7 @@ def main(args):
                 print('MSE test is:', MSE_ts)
                 print('RMSE test is:', RMSE_ts)
 
-                if epch%25==0:
+                if epch%5==0:
                     # Save errors
                     fn_str = args.RESULTPATH + 'sc_MSE_tr_%s_%s_%s_%s_epch%s.npy' \
                     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)

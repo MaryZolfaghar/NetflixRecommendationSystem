@@ -17,15 +17,34 @@ def calc_eig(args, L, Ws, kk):
     D=np.diag(np.sum(Ws, axis=0))
     vol=np.sum(np.diag(D))
 
-    # vals, vecs = np.linalg.eig(L)
-    # vals, vecs = linalg.eig(L)
     vals, vecs = eigsh(L, k=kk, which="SM")  # Largest 5 eigenvalues/vectors
     vecs = vecs.real
+
+    if (vals[0]==0):
+        if vals[1] > 0:
+            vals = vals[1:]
+            vecs = vecs[:,1:]
+    if (vals[0]<1e-10):
+        vals = vals[1:]
+        vecs = vecs[:,1:]
+
+    #caluclate eigen gap
+    e1 = np.zeros([vals.shape[0]+1])
+    e2 = np.zeros([vals.shape[0]+1])
+    print(e1.shape)
+    e1[1:] = vals.copy()
+    e2[:-1] = vals.copy()
+    print('eigen gap is:')
+    eigengap=(e2-e1)
+    print(eigengap)
+    #
+
+
     # eigenvalues
-    print('eigenvalues:')
+    print('eigenvalues shape is:')
     print(vals.shape)
     # eigenvectors
-    print('eigenvectors:')
+    print('eigenvectors shape is :')
     print(vecs.shape)
     if args.normalize_laplacian:
         print('do the normalization')
@@ -38,4 +57,4 @@ def calc_eig(args, L, Ws, kk):
     elapsed_time = time.time() - t1
     print('Elapsed time is {} seconds: '.format(elapsed_time))
     print('calc eigen vectors and values done!')
-    return vals, vecs, v_norm
+    return vals, vecs, v_norm, eigengap
