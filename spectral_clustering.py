@@ -129,7 +129,7 @@ def main(args):
         train_data[tst_ind0, tst_ind1] = 0
         trn_trget = train_data[tr_ind0, tr_ind1].copy()
 
-        #===========================================================================
+        #=======================================================================
         # STEP 1 - Calculate similarity
         sim_UXU, sim_MXM = gen_similarity(args, train_data)
         print('gen similarity is done')
@@ -178,9 +178,10 @@ def main(args):
                         dfz=data_fill_zeros[:,km.labels_==ctst].copy()
                         # find user that rated at least one of the movies
                         goodU= np.mean(dfz, axis=1)
-                        # trdata = train_data[:,km.labels_==ctst]
                         if goodU.shape[0] > 0:
-                            indxgu=np.where(goodU > 0) # index for users that rate at least one of the movies in that clustr
+                            # index for users that rate at least one of
+                            # the movies in that clustr
+                            indxgu=np.where(goodU > 0)
                             trdata = train_data[:, km.labels_==ctst]
                             trdata = trdata[indxgu[0], :]
                         else:
@@ -188,8 +189,8 @@ def main(args):
                         trdata = np.mean(trdata,axis=0)
                         pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
                         if ic%50==0:
-                            print('interation for labes (ic)', ic)
-                            print('one iteration in predicting clusters time elapsed: {} sec'.format(time.time()-t1))
+                            print('interation for finding clusters (ic)', ic)
+                            print('one iter in pred clust time: {} sec'.format(time.time()-t1))
                 elif args.graph_nodes=='U': # menas the sim is UXU
                     pred_ratings = np.zeros(train_data.shape[0])
                     for ic in range(train_data.shape[0]):
@@ -201,7 +202,6 @@ def main(args):
 
                 pred_tst = pred_ratings[tst_ind1]
                 pred_tr = pred_ratings[tr_ind1]
-
                 err_tr = (pred_tr - trn_trget)**2
                 err_ts = (pred_tst - tst_trget)**2
 
@@ -213,7 +213,6 @@ def main(args):
                 prc_correct_train[epch, ikk] = prc_correct_tr
                 print('count correct train ', count_correct_tr)
                 print('percentage correct train ', prc_correct_tr)
-
 
                 diff_ts = (pred_tst - tst_trget)
                 incorrect_ts = np.nonzero(diff_ts)[0]
