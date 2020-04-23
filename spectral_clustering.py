@@ -179,13 +179,16 @@ def main(args):
                                      random_state=0,
                                      batch_size=100,
                                      max_iter=100)
-                print('sMiniBatchKMeans time elapsed: {} sec'.format(time.time()-t1))
+                print('MiniBatchKMeans time elapsed: {} sec'.format(time.time()-t1))
                 km.fit(U)
                 print('MiniBatchKMeans Fit time elapsed: {} sec'.format(time.time()-t1))
 
                 if args.graph_nodes=='M': # menas the sim is MXM
                     pred_ratings = np.zeros(train_data.shape[1])
                     for ic in range(train_data.shape[1]):
+                        t1=time.time()
+                        if ic%10==0:
+                            print('interation for labes (ic)', ic)
                         ctst = km.labels_[ic]
                         indctst = km.labels_[km.labels_==ctst]
                         dfz=data_fill_zeros[:,km.labels_==ctst].copy()
@@ -200,7 +203,7 @@ def main(args):
                             trdata = train_data[:, km.labels_==ctst]
                         trdata = np.mean(trdata,axis=0)
                         pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
-
+                        print('one iteration in predicting clusters time elapsed: {} sec'.format(time.time()-t1))
                 elif args.graph_nodes=='U': # menas the sim is UXU
                     pred_ratings = np.zeros(train_data.shape[0])
                     for ic in range(train_data.shape[0]):
