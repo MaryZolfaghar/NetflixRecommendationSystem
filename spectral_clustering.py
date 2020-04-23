@@ -89,9 +89,9 @@ def main(args):
     # train a k-means model and use it to classify the data
     #===========================================================================
     if args.graph_nodes=='M':
-        n_k = [50, 100]
+        n_k = [10, 50, 100]
     elif args.graph_nodes=='U':
-        n_k = [50, 100]
+        n_k = [10, 50, 100]
 
 
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
