@@ -10,7 +10,6 @@ echo Running on $HOSTNAME
 source /usr/local/anaconda3/etc/profile.d/conda.sh
 conda activate /home/mazlfghr/.conda/envs/MLprj
 
-echo "Process spectral_clustering starts"
+echo "Process spectral_clustering skleran starts"
 
-python spectral_clustering.py \
---graph_nodes U \
+python spectral_clustering_sklearn.py

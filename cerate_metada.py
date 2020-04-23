@@ -61,13 +61,7 @@ main function
 """
 def main(args):
     df, A, A_fill_zeros = read_preprocss_data(args)
-    print('done reading the data')
-
-    fn_str = args.RESULTPATH + 'sc_prc_corr_ts_%s_%s_%s_epch%s.npy' \
-    %(args.fillnan, args.sim_method, args.test_prc, epch)
-    with open(fn_str, 'wb') as f:
-        pickle.dump(prc_correct_test, f)
-    print('saving in spectral clustering is done')
+    print('saving in creating metadata is done')
 
 """
 ==============================================================================

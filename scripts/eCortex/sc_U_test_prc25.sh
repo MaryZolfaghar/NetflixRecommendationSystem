@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH -p localLimited
 #SBATCH -A ecortex
-#SBATCH --mem=10G
+#SBATCH --mem=30G
 
 export HOME=`getent passwd $USER | cut -d':' -f6`
 export PYTHONUNBUFFERED=1

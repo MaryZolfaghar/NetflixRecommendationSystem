@@ -10,7 +10,7 @@ import argparse
 import pickle
 import time
 
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans, SpectralClustering
 
 from utils.read_preprocss_data import read_preprocss_data
 from utils.calc_eig import calc_eig
@@ -173,7 +173,12 @@ def main(args):
                 # STEP 5 - using k centers to predict data
                 U = np.array(vecs)
                 print('U array eigenvectors shape:', U.shape)
-                km = KMeans(init='k-means++', n_clusters=kk)
+                km = MiniBatchKMeans(n_clusters=kk,
+                                     random_state=0,
+                                     batch_size=100,
+                                     max_iter=100)
+                                
+                # km = KMeans(init='k-means++', n_clusters=kk)
                 km.fit(U)
 
                 if args.graph_nodes=='M': # menas the sim is MXM

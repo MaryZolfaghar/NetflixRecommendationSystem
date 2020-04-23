@@ -20,5 +20,6 @@ conda activate /home/mazlfghr/.conda/envs/MLprj
 ### sbatch scripts/eCortex/sc_U_test_prc25.sh &
 sbatch scripts/eCortex/sc_M.sh &
 sbatch scripts/eCortex/sc_M_test_prc25.sh &
+sbatch scripts/eCortex/sc_sklearn.sh &
 
 wait
