@@ -178,7 +178,6 @@ def main(args):
                                      batch_size=100,
                                      max_iter=100)
                                 
-                # km = KMeans(init='k-means++', n_clusters=kk)
                 km.fit(U)
 
                 if args.graph_nodes=='M': # menas the sim is MXM

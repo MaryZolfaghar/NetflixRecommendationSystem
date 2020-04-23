@@ -42,6 +42,9 @@ parser.add_argument('--norm_laplacian_k', type=int, default=5,
                     help='k in laplacian normalization and its eigen vector clustering')
 parser.add_argument('--normalize_laplacian', action='store_true',
                     help='whether normalize laplacian or not')
+parser.add_argument('--affinity_method', choices=['rbf','cosine_similarity'],
+                    default='cosine_similarity',
+                    help='What type of similarity method should use in SpectralClustering')
 # Kmeans
 parser.add_argument('--kmeans_k', type=int, default=5,
                     help='number of clusters in kmeans')
@@ -130,31 +133,20 @@ def main(args):
         trn_trget = train_data[tr_ind0, tr_ind1].copy()
 
         #===========================================================================
-        # STEP 1 - Calculate similarity
-        sim_UXU, sim_MXM = gen_similarity(args, train_data)
-        print('gen similarity is done')
-
-        # STEP 2 - computing the laplacian
-        if args.graph_nodes=='M':
-            Ws = sim_MXM.copy()
-        elif args.graph_nodes=='U':
-            Ws = sim_UXU.copy()
-        L, D = calc_laplacian(args, Ws)
-        print('calc laplacian is done')
 
         for ikk, kk in enumerate(n_k):
                 num_clusters=kk
                 time_start=time.time()
                 print('k: ', kk)
                 print('ikk:', ikk)
-                vals, vecs, v_norm = calc_eig(args, L, Ws, kk)
-                # STEP 5 - using k centers to predict data
-                U = np.array(vecs)
-                print('U array eigenvectors shape:', U.shape)
+                # vals, vecs, v_norm = calc_eig(args, L, Ws, kk)
+                # # STEP 5 - using k centers to predict data
+                # U = np.array(vecs)
+                # print('U array eigenvectors shape:', U.shape)
 
                 #1.###
                 t1=time.time()
-                sc = SpectralClustering(n_clusters=kk, random_state=0)
+                sc = SpectralClustering(n_clusters=kk, random_state=0, affinity = args.affinity_method)
                 sc.fit(train_data)
                 print('spectral_clustering train data and kmeans time elapsed: {} sec'.format(time.time()-t1))
 
@@ -162,157 +154,156 @@ def main(args):
                         %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, kk, epch)
                 with open(fn_str, 'wb') as f:
                         pickle.dump(sc, f)
-                #2.###
-                t1=time.time()
-                sc2= SpectralClustering(n_clusters=kk, random_state=0, affinity='cosine_similarity')
-                sc2.fit(train_data)
-                print('spectral_clustering cosine_similarity and kmeans time elapsed: {} sec'.format(time.time()-t1))
-
-                fn_str = args.RESULTPATH + 'sc_traindata_cosine_obj_%s_%s_%s_%s_k%s_epch%s' \
-                        %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, kk, epch)
-                with open(fn_str, 'wb') as f:
-                        pickle.dump(sc2, f)
-                #3.###
-                t1=time.time()
-                sc3= SpectralClustering(n_clusters=kk, random_state=0, affinity='precomputed')
-                sc3.fit(Ws)
-                print('spectral_clustering precomputed and kmeans time elapsed: {} sec'.format(time.time()-t1))
-
-                fn_str = args.RESULTPATH + 'sc_Ws_precomputed_obj_%s_%s_%s_%s_k%s_epch%s' \
-                        %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, kk, epch)
-                with open(fn_str, 'wb') as f:
-                        pickle.dump(sc3, f)
-                #4.###
-                t1=time.time()
-                sc4 = SpectralClustering(n_clusters=kk, random_state=0, affinity='precomputed')
-                sc4.fit(U)
-                print('spectral_clustering on eigenvectors U with precomputed and kmeans time elapsed: {} sec'.format(time.time()-t1))
-
-                fn_str = args.RESULTPATH + 'sc_U_obj_%s_%s_%s_%s_k%s_epch%s' \
-                        %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, kk, epch)
-                with open(fn_str, 'wb') as f:
-                        pickle.dump(sc4, f)
-
-
+                # #2.###
+                # t1=time.time()
+                # sc2= SpectralClustering(n_clusters=kk, random_state=0, affinity='cosine_similarity')
+                # sc2.fit(train_data)
+                # print('spectral_clustering cosine_similarity and kmeans time elapsed: {} sec'.format(time.time()-t1))
+                #
+                # fn_str = args.RESULTPATH + 'sc_traindata_cosine_obj_%s_%s_%s_%s_k%s_epch%s' \
+                #         %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, kk, epch)
+                # with open(fn_str, 'wb') as f:
+                #         pickle.dump(sc2, f)
+                # #3.###
+                # t1=time.time()
+                # sc3= SpectralClustering(n_clusters=kk, random_state=0, affinity='precomputed')
+                # sc3.fit(Ws)
+                # print('spectral_clustering precomputed and kmeans time elapsed: {} sec'.format(time.time()-t1))
+                #
+                # fn_str = args.RESULTPATH + 'sc_Ws_precomputed_obj_%s_%s_%s_%s_k%s_epch%s' \
+                #         %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, kk, epch)
+                # with open(fn_str, 'wb') as f:
+                #         pickle.dump(sc3, f)
+                # #4.###
+                # t1=time.time()
+                # sc4 = SpectralClustering(n_clusters=kk, random_state=0, affinity='precomputed')
+                # sc4.fit(U)
+                # print('spectral_clustering on eigenvectors U with precomputed and kmeans time elapsed: {} sec'.format(time.time()-t1))
+                #
+                # fn_str = args.RESULTPATH + 'sc_U_obj_%s_%s_%s_%s_k%s_epch%s' \
+                #         %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, kk, epch)
+                # with open(fn_str, 'wb') as f:
+                #         pickle.dump(sc4, f)
 
 
 
-                # if args.graph_nodes=='M': # menas the sim is MXM
-                #     pred_ratings = np.zeros(train_data.shape[1])
-                #     all_sc = [sc, sc1, sc2, sc3, sc4]
-                #     for km in all_sc:
-                #         for ic in range(train_data.shape[1]):
-                #             ctst = km.labels_[ic]
-                #             indctst = km.labels_[km.labels_==ctst]
-                #             dfz=data_fill_zeros[:,km.labels_==ctst].copy()
-                #             # find user that rated at least one of the movies
-                #             goodU= np.mean(dfz, axis=1)
-                #             # trdata = train_data[:,km.labels_==ctst]
-                #             if goodU.shape[0] > 0:
-                #                 indxgu=np.where(goodU > 0) # index for users that rate at least one of the movies in that clustr
-                #                 trdata = train_data[:, km.labels_==ctst]
-                #                 trdata = trdata[indxgu[0], :]
-                #             else:
-                #                 trdata = train_data[:, km.labels_==ctst]
-                #             trdata = np.mean(trdata,axis=0)
-                #             pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
 
-                # elif args.graph_nodes=='U': # menas the sim is UXU
-                #     pred_ratings = np.zeros(train_data.shape[0])
-                #     for ic in range(train_data.shape[0]):
-                #         ctst = km.labels_[ic]
-                #         indctst = km.labels_[km.labels_==ctst]
-                #         trdata = train_data[km.labels_==ctst, :]
-                #         trdata = np.mean(trdata,axis=1)
-                #         pred_ratings[ic] = np.ceil(np.mean(trdata, axis=0))
-                #
-                # pred_tst = pred_ratings[tst_ind1]
-                # pred_tr = pred_ratings[tr_ind1]
-                #
-                # err_tr = (pred_tr - trn_trget)**2
-                # err_ts = (pred_tst - tst_trget)**2
-                #
-                # diff_tr = (pred_tr - trn_trget)
-                # incorrect_tr = np.nonzero(diff_tr)[0]
-                # count_correct_tr = diff_tr.shape[0] - incorrect_tr.shape[0]
-                # prc_correct_tr = count_correct_tr/diff_tr.shape[0]
-                # counts_corr_train[epch, ikk] = count_correct_tr
-                # prc_correct_train[epch, ikk] = prc_correct_tr
-                # print('count correct train ', count_correct_tr)
-                # print('percentage correct train ', prc_correct_tr)
-                #
-                #
-                # diff_ts = (pred_tst - tst_trget)
-                # incorrect_ts = np.nonzero(diff_ts)[0]
-                # count_correct_ts = diff_ts.shape[0] - incorrect_ts.shape[0]
-                # prc_correct_ts = count_correct_ts/diff_ts.shape[0]
-                # counts_corr_test[epch, ikk] = count_correct_ts
-                # prc_correct_test[epch, ikk] = prc_correct_ts
-                # print('count correct test ', count_correct_tr)
-                # print('percentage correct test ', prc_correct_tr)
-                #
-                # MSE_tr = np.mean(err_tr)
-                # RMSE_tr = np.sqrt(MSE_tr)
-                # MSEs_train[epch, ikk] = MSE_tr
-                # RMSEs_train[epch, ikk] = RMSE_tr
-                # print('MSE train is:', MSE_tr)
-                # print('RMSE train is:', RMSE_tr)
-                #
-                # MSE_ts = np.mean(err_ts)
-                # RMSE_ts = np.sqrt(MSE_ts)
-                # MSEs_test[epch, ikk] = MSE_ts
-                # RMSEs_test[epch, ikk] = RMSE_ts
-                # print('MSE test is:', MSE_ts)
-                # print('RMSE test is:', RMSE_ts)
-                #
-                # if epch%25==0:
-                #     # Save errors
-                #     fn_str = args.RESULTPATH + 'sc_MSE_tr_%s_%s_%s_%s_epch%s.npy' \
-                #     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(MSEs_train, f)
-                #
-                #     fn_str = args.RESULTPATH + 'sc_RMSE_tr_%s_%s_%s_%s_epch%s.npy' \
-                #     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(RMSEs_train, f)
-                #
-                #     fn_str = args.RESULTPATH + 'sc_MSE_ts_%s_%s_%s_%s_epch%s.npy' \
-                #     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(MSEs_test, f)
-                #
-                #     fn_str = args.RESULTPATH + 'sc_RMSE_ts_%s_%s_%s_%s_epch%s.npy' \
-                #     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(RMSEs_test, f)
-                #
-                #     fn_str = args.RESULTPATH + 'sc_kmeans_obj_%s_%s_%s_%s_epch%s' \
-                #     %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #             pickle.dump(km, f)
-                #
-                #     #
-                #     fn_str = args.RESULTPATH + 'sc_cnt_corr_tr_%s_%s_%s_epch%s.npy' \
-                #     %(args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(counts_corr_train, f)
-                #
-                #     fn_str = args.RESULTPATH + 'sc_cnt_corr_ts_%s_%s_%s_epch%s.npy' \
-                #     %(args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(counts_corr_test, f)
-                #
-                #     fn_str = args.RESULTPATH + 'sc_prc_corr_tr_%s_%s_%s_epch%s.npy' \
-                #     %(args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(prc_correct_train, f)
-                #
-                #     fn_str = args.RESULTPATH + 'sc_prc_corr_ts_%s_%s_%s_epch%s.npy' \
-                #     %(args.fillnan, args.sim_method, args.test_prc, epch)
-                #     with open(fn_str, 'wb') as f:
-                #         pickle.dump(prc_correct_test, f)
-                #     print('saving in spectral clustering is done')
+
+                if args.graph_nodes=='M': # menas the sim is MXM
+                    pred_ratings = np.zeros(train_data.shape[1])
+                    km=sc
+                    for ic in range(train_data.shape[1]):
+                        ctst = km.labels_[ic]
+                        indctst = km.labels_[km.labels_==ctst]
+                        dfz=data_fill_zeros[:,km.labels_==ctst].copy()
+                        # find user that rated at least one of the movies
+                        goodU= np.mean(dfz, axis=1)
+                        # trdata = train_data[:,km.labels_==ctst]
+                        if goodU.shape[0] > 0:
+                            indxgu=np.where(goodU > 0) # index for users that rate at least one of the movies in that clustr
+                            trdata = train_data[:, km.labels_==ctst]
+                            trdata = trdata[indxgu[0], :]
+                        else:
+                            trdata = train_data[:, km.labels_==ctst]
+                        trdata = np.mean(trdata,axis=0)
+                        pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
+
+                elif args.graph_nodes=='U': # menas the sim is UXU
+                    pred_ratings = np.zeros(train_data.shape[0])
+                    for ic in range(train_data.shape[0]):
+                        ctst = km.labels_[ic]
+                        indctst = km.labels_[km.labels_==ctst]
+                        trdata = train_data[km.labels_==ctst, :]
+                        trdata = np.mean(trdata,axis=1)
+                        pred_ratings[ic] = np.ceil(np.mean(trdata, axis=0))
+
+                pred_tst = pred_ratings[tst_ind1]
+                pred_tr = pred_ratings[tr_ind1]
+
+                err_tr = (pred_tr - trn_trget)**2
+                err_ts = (pred_tst - tst_trget)**2
+
+                diff_tr = (pred_tr - trn_trget)
+                incorrect_tr = np.nonzero(diff_tr)[0]
+                count_correct_tr = diff_tr.shape[0] - incorrect_tr.shape[0]
+                prc_correct_tr = count_correct_tr/diff_tr.shape[0]
+                counts_corr_train[epch, ikk] = count_correct_tr
+                prc_correct_train[epch, ikk] = prc_correct_tr
+                print('count correct train ', count_correct_tr)
+                print('percentage correct train ', prc_correct_tr)
+
+
+                diff_ts = (pred_tst - tst_trget)
+                incorrect_ts = np.nonzero(diff_ts)[0]
+                count_correct_ts = diff_ts.shape[0] - incorrect_ts.shape[0]
+                prc_correct_ts = count_correct_ts/diff_ts.shape[0]
+                counts_corr_test[epch, ikk] = count_correct_ts
+                prc_correct_test[epch, ikk] = prc_correct_ts
+                print('count correct test ', count_correct_tr)
+                print('percentage correct test ', prc_correct_tr)
+
+                MSE_tr = np.mean(err_tr)
+                RMSE_tr = np.sqrt(MSE_tr)
+                MSEs_train[epch, ikk] = MSE_tr
+                RMSEs_train[epch, ikk] = RMSE_tr
+                print('MSE train is:', MSE_tr)
+                print('RMSE train is:', RMSE_tr)
+
+                MSE_ts = np.mean(err_ts)
+                RMSE_ts = np.sqrt(MSE_ts)
+                MSEs_test[epch, ikk] = MSE_ts
+                RMSEs_test[epch, ikk] = RMSE_ts
+                print('MSE test is:', MSE_ts)
+                print('RMSE test is:', RMSE_ts)
+
+                if epch%50==0:
+                    # Save errors
+                    fn_str = args.RESULTPATH + 'sc_MSE_tr_%s_%s_%s_%s_epch%s.npy' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(MSEs_train, f)
+
+                    fn_str = args.RESULTPATH + 'sc_RMSE_tr_%s_%s_%s_%s_epch%s.npy' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(RMSEs_train, f)
+
+                    fn_str = args.RESULTPATH + 'sc_MSE_ts_%s_%s_%s_%s_epch%s.npy' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(MSEs_test, f)
+
+                    fn_str = args.RESULTPATH + 'sc_RMSE_ts_%s_%s_%s_%s_epch%s.npy' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(RMSEs_test, f)
+
+                    fn_str = args.RESULTPATH + 'sc_kmeans_obj_%s_%s_%s_%s_epch%s' \
+                    %(args.graph_nodes, args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                            pickle.dump(km, f)
+
+                    #
+                    fn_str = args.RESULTPATH + 'sc_cnt_corr_tr_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(counts_corr_train, f)
+
+                    fn_str = args.RESULTPATH + 'sc_cnt_corr_ts_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(counts_corr_test, f)
+
+                    fn_str = args.RESULTPATH + 'sc_prc_corr_tr_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(prc_correct_train, f)
+
+                    fn_str = args.RESULTPATH + 'sc_prc_corr_ts_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(prc_correct_test, f)
+                    print('saving in spectral clustering is done')
 
 """
 ==============================================================================

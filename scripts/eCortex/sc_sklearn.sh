@@ -12,4 +12,5 @@ conda activate /home/mazlfghr/.conda/envs/MLprj
 
 echo "Process spectral_clustering skleran starts"
 
-python spectral_clustering_sklearn.py
+python spectral_clustering_sklearn.py \
+--affinity_method cosine \
