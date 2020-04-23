@@ -173,12 +173,15 @@ def main(args):
                 # STEP 5 - using k centers to predict data
                 U = np.array(vecs)
                 print('U array eigenvectors shape:', U.shape)
+
+                t1=time.time()
                 km = MiniBatchKMeans(n_clusters=kk,
                                      random_state=0,
                                      batch_size=100,
                                      max_iter=100)
-                                
+                print('sMiniBatchKMeans time elapsed: {} sec'.format(time.time()-t1))
                 km.fit(U)
+                print('MiniBatchKMeans Fit time elapsed: {} sec'.format(time.time()-t1))
 
                 if args.graph_nodes=='M': # menas the sim is MXM
                     pred_ratings = np.zeros(train_data.shape[1])
