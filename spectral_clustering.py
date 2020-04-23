@@ -190,7 +190,8 @@ def main(args):
                         pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
                         if ic%50==0:
                             print('interation for finding clusters (ic)', ic)
-                            print('one iter in pred clust time: {} sec'.format(time.time()-t1))
+                            print('Epalsed time: {} sec'.format(time.time()-t1))
+                            print('\n')
                 elif args.graph_nodes=='U': # menas the sim is UXU
                     pred_ratings = np.zeros(train_data.shape[0])
                     for ic in range(train_data.shape[0]):
@@ -199,18 +200,22 @@ def main(args):
                         trdata = train_data[km.labels_==ctst, :]
                         trdata = np.mean(trdata,axis=1)
                         pred_ratings[ic] = np.ceil(np.mean(trdata, axis=0))
-
+                print('start calculating the error')
+                t1=time.time()
                 pred_tst = pred_ratings[tst_ind1]
                 pred_tr = pred_ratings[tr_ind1]
                 err_tr = (pred_tr - trn_trget)**2
                 err_ts = (pred_tst - tst_trget)**2
+                print('Done calc err time: {} sec'.format(time.time()-t1))
 
+                t1=time.time()
                 diff_tr = (pred_tr - trn_trget)
                 incorrect_tr = np.nonzero(diff_tr)[0]
                 count_correct_tr = diff_tr.shape[0] - incorrect_tr.shape[0]
                 prc_correct_tr = count_correct_tr/diff_tr.shape[0]
                 counts_corr_train[epch, ikk] = count_correct_tr
                 prc_correct_train[epch, ikk] = prc_correct_tr
+                print('Done calc cnt corr time: {} sec'.format(time.time()-t1))
                 print('count correct train ', count_correct_tr)
                 print('percentage correct train ', prc_correct_tr)
 
