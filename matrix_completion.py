@@ -83,7 +83,7 @@ def main(args):
     #===========================================================================
     # STEP
     #===========================================================================
-    n_k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40]
+    n_k = [3, 4, 5, 10]
 
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
     RMSEs_train = np.zeros((args.n_epochs, len(n_k)))
@@ -154,6 +154,7 @@ def main(args):
                 print('percentage correct test ', prc_correct_tr)
 
 
+
                 MSE_tr = np.mean(err_tr)
                 RMSE_tr = np.sqrt(MSE_tr)
                 MSEs_train[epch, ikk] = MSE_tr
@@ -167,7 +168,12 @@ def main(args):
                 RMSEs_test[epch, ikk] = RMSE_ts
                 print('MSE test is:', MSE_ts)
                 print('RMSE test is:', RMSE_ts)
-                if epch%5==0:
+                if epch%50==0:
+                    fn_str = args.RESULTPATH + 'mc_pred_rating_%s_%s_%s_epch%s.npy' \
+                    %(args.fillnan, args.sim_method, args.test_prc, epch)
+                    with open(fn_str, 'wb') as f:
+                        pickle.dump(pred_ratings, f)
+
                     # Save errors
                     fn_str = args.RESULTPATH + 'mc_MSE_tr_%s_%s_%s_epch%s.npy' \
                     %(args.fillnan, args.sim_method, args.test_prc, epch)
