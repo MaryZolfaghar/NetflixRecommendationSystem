@@ -92,9 +92,9 @@ def main(args):
     # train a k-means model and use it to classify the data
     #===========================================================================
     if args.graph_nodes=='M':
-        n_k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40]
+        n_k = [3, 4, 5, 10]
     elif args.graph_nodes=='U':
-        n_k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40]
+        n_k = [3, 4, 5, 10] #n_k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40]
 
 
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
@@ -147,7 +147,7 @@ def main(args):
                 #1.###
                 t1=time.time()
                 sc = SpectralClustering(n_clusters=kk, random_state=0, affinity = args.affinity_method)
-                sc.fit(train_data)
+                sc.fit(train_data.T)
                 print('spectral_clustering train data and kmeans time elapsed: {} sec'.format(time.time()-t1))
 
                 fn_str = args.RESULTPATH + 'sc_traindata_obj_%s_%s_%s_%s_k%s_epch%s' \

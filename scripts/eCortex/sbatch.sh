@@ -13,8 +13,8 @@ conda activate /home/mazlfghr/.conda/envs/MLprj
 # sbatch scripts/eCortex/create_metadata.sh &
 # sbatch scripts/eCortex/mc_U.sh &
 # sbatch scripts/eCortex/mc_U_test_prc25.sh &
-# sbatch scripts/eCortex/mc_M.sh &
-# sbatch scripts/eCortex/mc_M_test_prc25.sh &
+sbatch scripts/eCortex/mc_M.sh &
+sbatch scripts/eCortex/mc_M_test_prc25.sh &
 
 ### sbatch scripts/eCortex/sc_U.sh &
 ### sbatch scripts/eCortex/sc_U_test_prc25.sh &

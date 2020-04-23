@@ -89,9 +89,9 @@ def main(args):
     # train a k-means model and use it to classify the data
     #===========================================================================
     if args.graph_nodes=='M':
-        n_k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40]
+        n_k = [3, 4, 5, 10]
     elif args.graph_nodes=='U':
-        n_k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40]
+        n_k = [3, 4, 5, 10]
 
 
     MSEs_train = np.zeros((args.n_epochs, len(n_k)))
@@ -172,6 +172,7 @@ def main(args):
                 vals, vecs, v_norm = calc_eig(args, L, Ws, kk)
                 # STEP 5 - using k centers to predict data
                 U = np.array(vecs)
+                U = U[:,:200]
                 print('U array eigenvectors shape:', U.shape)
 
                 t1=time.time()
@@ -187,8 +188,7 @@ def main(args):
                     pred_ratings = np.zeros(train_data.shape[1])
                     for ic in range(train_data.shape[1]):
                         t1=time.time()
-                        if ic%10==0:
-                            print('interation for labes (ic)', ic)
+
                         ctst = km.labels_[ic]
                         indctst = km.labels_[km.labels_==ctst]
                         dfz=data_fill_zeros[:,km.labels_==ctst].copy()
@@ -203,7 +203,9 @@ def main(args):
                             trdata = train_data[:, km.labels_==ctst]
                         trdata = np.mean(trdata,axis=0)
                         pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
-                        print('one iteration in predicting clusters time elapsed: {} sec'.format(time.time()-t1))
+                        if ic%50==0:
+                            print('interation for labes (ic)', ic)
+                            print('one iteration in predicting clusters time elapsed: {} sec'.format(time.time()-t1))
                 elif args.graph_nodes=='U': # menas the sim is UXU
                     pred_ratings = np.zeros(train_data.shape[0])
                     for ic in range(train_data.shape[0]):
