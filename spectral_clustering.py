@@ -157,7 +157,6 @@ def main(args):
 
                 # STEP 5 - using k centers to predict data
                 U = np.array(vecs)
-                # U = U[:,:200]
                 print('U array eigenvectors shape:', U.shape)
 
                 t1=time.time()

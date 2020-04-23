@@ -20,11 +20,17 @@ def calc_eig(args, L, Ws, kk):
     vals, vecs = eigsh(L, k=kk, which="SM")  # Largest 5 eigenvalues/vectors
     vecs = vecs.real
 
+    print('the first 10 eigen values are:')
+    print(vals[:10])
+    print('\n')
+
     if (vals[0]==0):
         if vals[1] > 0:
+            print('OOOPS the first eigen value was zero')
             vals = vals[1:]
             vecs = vecs[:,1:]
     if (vals[0]<1e-10):
+        print('OOOPS the first eigen value was so small')
         vals = vals[1:]
         vecs = vecs[:,1:]
 
@@ -37,6 +43,9 @@ def calc_eig(args, L, Ws, kk):
     print('eigen gap is:')
     eigengap=(e2-e1)
     print(eigengap)
+    print('the first 10 eigen values are:')
+    print(vals[:10])
+    print('\n')
     #
 
 
