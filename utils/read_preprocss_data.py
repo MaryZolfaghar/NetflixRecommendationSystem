@@ -5,6 +5,7 @@ Reading and preprocessing data
 import numpy as np
 import pandas as pd
 import pickle
+import time
 
 def read_preprocss_data(args):
     time_start=time.time()
