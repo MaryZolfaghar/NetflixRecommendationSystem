@@ -7,7 +7,7 @@ import pandas as pd
 import pickle
 
 def read_preprocss_data(args):
-
+    time_start=time.time()
     # args.DATAPATH = '../datasets/'
     train = pd.read_csv(args.DATAPATH + 'train.csv')
     test = pd.read_csv(args.DATAPATH + 'test.csv')
@@ -42,10 +42,11 @@ def read_preprocss_data(args):
         # replace inds with avg of column
         A[inds] = np.take(row_mean, inds[1])
 
-
+    print('Reading time elapsed: {} sec'.format(time.time()-time_start))
     print('Reading is done, the shape of the data is:', A.shape)
     ## Reading metadata ========================================================
     if args.metadata:
+        time_start = time.time()
         print('reading metadata')
         t1=[]; t2=[]; t3=[]
         with open(args.DATAPATH + 'movie_titles.txt', 'r',encoding="latin-1") as reading:
@@ -72,7 +73,9 @@ def read_preprocss_data(args):
         fn_str = args.DATAPATH + 'movie_titles_df.csv'
         with open(fn_str, 'wb') as f:
             pickle.dump(movie_titles, f)
+        print('Creating movie titles time elapsed: {} sec'.format(time.time()-time_start))
         ## =====================================================================
+        time_start = time.time()
         # try fiding correspoding data in train to add metadata features to it
         trnp = train.to_numpy()
         mtnp = movie_titles.to_numpy()
@@ -82,10 +85,11 @@ def read_preprocss_data(args):
         train_metadata['year_produced'] = np.zeros([train_metadata.shape[0]])
         train_metadata['year_produced']  = 'NaN'
 
+        train_temp = train_metadata['title'].copy()
+
         # try to add movie titles to the train data, seems this takes long so skip for now
         titles=[]
         years=[]
-        # print(trnp.shape)
         for itr in range(trnp.shape[0]):
             if (itr%10000==0):
                 print(itr)
@@ -95,14 +99,26 @@ def read_preprocss_data(args):
             years.append(mm.year_produced.to_string())
 
         titles = np.asarray(titles)
+        years = np.asarray(years)
         # print(titles.shape)
         train_metadata['title'] = titles
         train_metadata['year_produced'] = years
         print('done with creating metadata')
+
+        train_temp['title'] = titles
+        train_temp['year_produced'] = years
+        print('Creating metadata time elapsed: {} sec'.format(time.time()-time_start))
+        print('done with creating temp metadata!')
         ## =====================================================================
         # Save movie titles
         fn_str = args.DATAPATH + 'train_metadata.csv'
         with open(fn_str, 'wb') as f:
             pickle.dump(train_metadata, f)
         print('done with savind metadata')
+
+        fn_str = args.DATAPATH + 'train_temp_metadata.csv'
+        with open(fn_str, 'wb') as f:
+            pickle.dump(train_temp, f)
+        print('done with savind temp metadata')
+
     return df, A, A_fill_zeros
