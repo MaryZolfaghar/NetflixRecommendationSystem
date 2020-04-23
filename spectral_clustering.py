@@ -169,10 +169,10 @@ def main(args):
                 time_start=time.time()
                 print('k: ', kk)
                 print('ikk:', ikk)
-                vals, vecs, v_norm = calc_eig(args, L, Ws, kk)
+                vals, vecs, v_norm = calc_eig(args, L, Ws, 200)
                 # STEP 5 - using k centers to predict data
                 U = np.array(vecs)
-                U = U[:,:200]
+                # U = U[:,:200]
                 print('U array eigenvectors shape:', U.shape)
 
                 t1=time.time()
