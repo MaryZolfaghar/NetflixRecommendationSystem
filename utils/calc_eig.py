@@ -17,8 +17,14 @@ def calc_eig(args, L, Ws, kk):
     D=np.diag(np.sum(Ws, axis=0))
     vol=np.sum(np.diag(D))
 
-    vals, vecs = eigsh(L, k=kk, which="SM")  # Largest 5 eigenvalues/vectors
+    # vals, vecs = eigsh(L, k=kk, which="SM")  # Largest 5 eigenvalues/vectors
+    # vecs = vecs.real
+
+    vals, vecs = np.linalg.eig(L)
     vecs = vecs.real
+    vals = vals[np.argsort(vals)]
+    vals = vals[1:]
+    vecs = vecs[:,np.argsort(vals)]
 
     print('the first 10 eigen values are:')
     print(vals[:10])
