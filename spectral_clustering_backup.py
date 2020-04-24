@@ -169,31 +169,25 @@ def main(args):
                 print('MiniBatchKMeans Fit time elapsed: {} sec'.format(time.time()-t1))
 
                 if args.graph_nodes=='M': # menas the sim is MXM
-                    labels = np.zeros([kk])
                     pred_ratings = np.zeros(train_data.shape[1])
                     t0=time.time()
-                    for il, lbl in enumerate(range(kk)):
-                        print('label is:', lbl)
-                        print('km.labels_', np.unique(km.labels_))
-                        dfz=data_fill_zeros[:,km.labels_==lbl].copy()
+                    for ic in range(train_data.shape[1]):
+                        ctst = km.labels_[ic]
+                        indctst = km.labels_[km.labels_==ctst]
+                        dfz=data_fill_zeros[:,km.labels_==ctst].copy()
                         # find user that rated at least one of the movies
                         goodU= np.mean(dfz, axis=1)
                         if goodU.shape[0] > 0:
                             # index for users that rate at least one of
                             # the movies in that clustr
                             indxgu=np.where(goodU > 0)
-                            trdata = train_data[:, km.labels_==lbl]
+                            trdata = train_data[:, km.labels_==ctst]
                             trdata = trdata[indxgu[0], :]
                         else:
-                            trdata = train_data[:, km.labels_==lbl]
-
+                            trdata = train_data[:, km.labels_==ctst]
                         trdata = np.mean(trdata,axis=0)
-                        labels[il] = np.ceil(np.mean(trdata,axis=0))
-
-                    for ic in range(train_data.shape[1]):
-                        ctst = km.labels_[ic]
-                        pred_ratings[ic] = labels[ctst]
-                        if ic%100==0:
+                        pred_ratings[ic] = np.ceil(np.mean(trdata,axis=0))
+                        if ic%50==0:
                             print('interation for finding clusters (ic)', ic)
                             print('Epalsed time: {} sec'.format(time.time()-t0))
                             print('\n')
@@ -204,22 +198,13 @@ def main(args):
                     print('Done calc err time: {} sec'.format(time.time()-t1))
 
                 elif args.graph_nodes=='U': # menas the sim is UXU
-                    labels = np.zeros([kk])
                     pred_ratings = np.zeros(train_data.shape[0])
-                    t0=time.time()
-                    for il, lbl in enumerate(range(kk)):
-                        print('label is:', lbl)
-                        print('km.labels_', np.unique(km.labels_))
-                        trdata = train_data[km.labels_==lbl,:]
-                        trdata = np.mean(trdata,axis=1)
-                        labels[il] = np.ceil(np.mean(trdata, axis=0))
                     for ic in range(train_data.shape[0]):
                         ctst = km.labels_[ic]
-                        pred_ratings[ic] = labels[ctst]
-                        if ic%100==0:
-                            print('interation for finding clusters (ic)', ic)
-                            print('Epalsed time: {} sec'.format(time.time()-t0))
-                            print('\n')
+                        indctst = km.labels_[km.labels_==ctst]
+                        trdata = train_data[km.labels_==ctst, :]
+                        trdata = np.mean(trdata,axis=1)
+                        pred_ratings[ic] = np.ceil(np.mean(trdata, axis=0))
                     print('start calculating the error')
                     t1=time.time()
                     pred_tst = pred_ratings[tst_ind0]
